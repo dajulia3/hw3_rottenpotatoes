@@ -21,9 +21,14 @@ end
 #  "When I uncheck the following ratings: PG, G, R"
 #  "When I check the following ratings: G"
 
-When /I (uncheck | check) the following ratings: (.*)/ do |check_uncheck, rating_list|
+When /I (uncheck|check) the following ratings: (.*)/ do |check_uncheck, rating_list|
   # HINT: use String#split to split up the rating_list, then
   #   iterate over the ratings and reuse the "When I check..." or
   #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
-  rating_list.split(/".*"\s*(,\s*".*")*/).each {|rating| step "When I #{check_uncheck} ratings[#{rating}]"}
+  ratings_arr = rating_list.scan(/"([^"]*)"\s*,?\s*/).flatten
+  if check_uncheck == "check"
+    ratings_arr.each {|rating|check "ratings["+rating+"]" }
+  elsif check_uncheck =="uncheck"
+    ratings_arr.each {|rating|uncheck "ratings["+rating+"]" }
+  end
 end
